@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+install() {
+  if ! command -v helm &> /dev/null
+  then
+    echo "helm could not be found. Please install it"
+    exit
+  fi
+
+  # Between helm2 and helm3, they changed how to manage plugins and where they
+  # get installed. So the easiest thing to do is just uninstall from both and
+  # throw away any errors then try to reinstall.
+
+  # If helm2/3 see that the plugin is already installed, it just fails, so
+  # we'll uninstall and re-install. There's no way to overwrite in place
+
+  # Uninstall helm2 plugin
+  helm plugin remove diff > /dev/null
+
+  # Uninstall helm3 plugin
+  helm plugin uninstall diff > /dev/null
+
+  helm plugin install https://github.com/databus23/helm-diff --version v"${ASDF_INSTALL_VERSION}"
+}
+
+install $ASDF_INSTALL_TYPE $ASDF_INSTALL_VERSION $ASDF_INSTALL_PATH
